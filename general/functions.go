@@ -2,6 +2,7 @@ package general
 
 import (
 	"encoding/json"
+	"encoding/base64"
 	"fmt"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/runes"
@@ -14,6 +15,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"math/rand"
+
 )
 
 // ReadConfigJson Reads Settings file.
@@ -186,4 +189,37 @@ func RemoveAccentuation(s string) string {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	s, _, _ = transform.String(t, s)
 	return s
+}
+
+// GetRandHash generates a random hash encoded in base64
+func GetRandHash(n int) string {
+
+	if n < 1 {
+		return ""
+	}
+
+	var seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+
+	s := make([]rune, n)
+	for i := range s {
+		s[i] = letters[seededRand.Intn(len(letters))]
+	}
+
+	se := base64.StdEncoding.EncodeToString([]byte(string(s)))
+	return se
+
+}
+
+// FindIndexOf returns indexOf an element in slice by predicate function
+func FindIndexOf(slice interface{}, f func(value interface{}) bool) int {
+	s := reflect.ValueOf(slice)
+	if s.Kind() == reflect.Slice {
+		for index := 0; index < s.Len(); index++ {
+			if f(s.Index(index).Interface()) {
+				return index
+			}
+		}
+	}
+	return -1
 }
