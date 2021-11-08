@@ -193,7 +193,7 @@ func RemoveAccentuation(s string) string {
 func ConvertToCurrency(price interface{}) string {
 	intPrice := ConvertInterfaceToInt64(price)
 	if intPrice == 0 {
-		return ""
+		return "0"
 	}
 
 	val := strconv.FormatInt(intPrice, 10)
