@@ -189,7 +189,7 @@ func RemoveAccentuation(s string) string {
 	return s
 }
 
-// ConvertToCurrency convert price interface to string
+// ConvertToCurrency convert price int64 to string with decimal values
 func ConvertToCurrency(price int64) string {
 	if price == 0 {
 		return "0"
@@ -207,7 +207,7 @@ func ConvertToCurrency(price int64) string {
 	return fmt.Sprintf("%s,%s", substr1, substr2)
 }
 
-// ConvertCurrencyToFloat64 convert price interface to float64
+// ConvertCurrencyToFloat64 convert price int64 to float64
 func ConvertCurrencyToFloat64(price int64) float64 {
 	strPrice := ConvertToCurrency(price)
 	strPrice = strings.ReplaceAll(strPrice, ",", ".")
