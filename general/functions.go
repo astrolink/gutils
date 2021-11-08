@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 	"unicode"
+	"unicode/utf8"
 )
 
 // ReadConfigJson Reads Settings file.
@@ -186,4 +187,31 @@ func RemoveAccentuation(s string) string {
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	s, _, _ = transform.String(t, s)
 	return s
+}
+
+// ConvertToCurrency convert price interface to string
+func ConvertToCurrency(price interface{}) string {
+	intPrice := ConvertInterfaceToInt64(price)
+	if intPrice == 0 {
+		return ""
+	}
+
+	val := strconv.FormatInt(intPrice, 10)
+	charCount := utf8.RuneCountInString(val)
+
+	substr1 := val[0:(charCount - 2)]
+	if substr1 == "" {
+		substr1 = "0"
+	}
+
+	substr2 := val[(charCount - 2):charCount]
+	return fmt.Sprintf("%s,%s", substr1, substr2)
+}
+
+// ConvertCurrencyToFloat64 convert price interface to float64
+func ConvertCurrencyToFloat64(price interface{}) float64 {
+	strPrice := ConvertToCurrency(price)
+	strPrice = strings.ReplaceAll(strPrice, ",", ".")
+	f, _ := strconv.ParseFloat(strPrice, 64)
+	return f
 }
