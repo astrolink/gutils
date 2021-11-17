@@ -63,7 +63,7 @@ func GetStringLocalizedTimeNowByCountryCode(countryCode string) (string, error) 
 func getCountryTimeZone(countryCode string) string {
 	var countryTimeZone string
 
-	switch countryCode {
+	switch strings.ToLower(countryCode) {
 	case globalization.ArgentinaCountryCode:
 		countryTimeZone = globalization.AmericaBuenosAiresTimeZone
 		break
