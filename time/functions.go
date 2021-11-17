@@ -3,6 +3,7 @@ package time
 import (
 	"github.com/astrolink/gutils/globalization"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -62,7 +63,7 @@ func GetStringLocalizedTimeNowByCountryCode(countryCode string) (string, error) 
 func getCountryTimeZone(countryCode string) string {
 	var countryTimeZone string
 
-	switch countryCode {
+	switch strings.ToLower(countryCode) {
 	case globalization.ArgentinaCountryCode:
 		countryTimeZone = globalization.AmericaBuenosAiresTimeZone
 		break
@@ -108,11 +109,17 @@ func getCountryTimeZone(countryCode string) string {
 	case globalization.PeruCountryCode:
 		countryTimeZone = globalization.AmericaLimaTimeZone
 		break
+	case globalization.PortugalCountryCode:
+		countryTimeZone = globalization.EuropeLisbon
+		break
+	case globalization.SpainCountryCode:
+		countryTimeZone = globalization.EuropeMadrid
+		break
 	case globalization.UruguayCountryCode:
 		countryTimeZone = globalization.AmericaMontevideoTimeZone
 		break
 	case globalization.UnitedStatesCountryCode:
-		countryTimeZone = globalization.AmericaNewYorkTimeZone
+		countryTimeZone = globalization.AmericaLosAngeles
 		break
 	case globalization.VenezuelaCountryCode:
 		countryTimeZone = globalization.AmericaCaracasTimeZone
@@ -122,4 +129,75 @@ func getCountryTimeZone(countryCode string) string {
 	}
 
 	return countryTimeZone
+}
+
+func GetGmtByCountryCode(countryCode string) int {
+	var gmt int
+
+	switch strings.ToLower(countryCode) {
+	case globalization.ArgentinaCountryCode:
+		gmt = globalization.MINUS_THREE_GMT
+		break
+	case globalization.ChileCountryCode:
+		gmt = globalization.MINUS_THREE_GMT
+		break
+	case globalization.BoliviaCountryCode:
+		gmt = globalization.MINUS_FOUR_GMT
+		break
+	case globalization.ColombiaCountryCode:
+		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.CostaRicaCountryCode:
+		gmt = globalization.MINUS_SIX_GMT
+		break
+	case globalization.CubaCountryCode:
+		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.DominicanRepublicCountryCode:
+		gmt = globalization.MINUS_FOUR_GMT
+		break
+	case globalization.EcuadorCountryCode:
+		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.ElSalvadorCountryCode:
+		gmt = globalization.MINUS_SIX_GMT
+		break
+	case globalization.GuatemalaCountryCode:
+		gmt = globalization.MINUS_SIX_GMT
+		break
+	case globalization.HondurasCountryCode:
+		gmt = globalization.MINUS_SIX_GMT
+		break
+	case globalization.MexicoCountryCode:
+		gmt = globalization.MINUS_SIX_GMT
+		break
+	case globalization.PanamaCountryCode:
+		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.ParaguayCountryCode:
+		gmt = globalization.MINUS_THREE_GMT
+		break
+	case globalization.PeruCountryCode:
+		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.PortugalCountryCode:
+		gmt = globalization.MINUS_ONE_GMT
+		break
+	case globalization.SpainCountryCode:
+		gmt = globalization.PLUS_ONE_GMT
+		break
+	case globalization.UruguayCountryCode:
+		gmt = globalization.MINUS_THREE_GMT
+		break
+	case globalization.UnitedStatesCountryCode:
+		gmt = globalization.MINUS_EIGHT_GMT
+		break
+	case globalization.VenezuelaCountryCode:
+		gmt = globalization.MINUS_FOUR_GMT
+		break
+	default:
+		gmt = globalization.MINUS_THREE_GMT
+	}
+
+	return gmt
 }
