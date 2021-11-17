@@ -109,6 +109,12 @@ func getCountryTimeZone(countryCode string) string {
 	case globalization.PeruCountryCode:
 		countryTimeZone = globalization.AmericaLimaTimeZone
 		break
+	case globalization.PortugalCountryCode:
+		countryTimeZone = globalization.EuropeLisbon
+		break
+	case globalization.SpainCountryCode:
+		countryTimeZone = globalization.EuropeMadrid
+		break
 	case globalization.UruguayCountryCode:
 		countryTimeZone = globalization.AmericaMontevideoTimeZone
 		break
@@ -173,6 +179,12 @@ func GetGmtByCountryCode(countryCode string) int {
 		break
 	case globalization.PeruCountryCode:
 		gmt = globalization.MINUS_FIVE_GMT
+		break
+	case globalization.PortugalCountryCode:
+		gmt = globalization.MINUS_ONE_GMT
+		break
+	case globalization.SpainCountryCode:
+		gmt = globalization.PLUS_ONE_GMT
 		break
 	case globalization.UruguayCountryCode:
 		gmt = globalization.MINUS_THREE_GMT

@@ -17,6 +17,8 @@ const (
 	PanamaCountryCode            = "pa"
 	ParaguayCountryCode          = "py"
 	PeruCountryCode              = "pe"
+	PortugalCountryCode          = "pt"
+	SpainCountryCode             = "es"
 	UruguayCountryCode           = "uy"
 	UnitedStatesCountryCode      = "us"
 	VenezuelaCountryCode         = "ve"
@@ -41,6 +43,8 @@ const (
 	AmericaLosAngeles           = "America/Los_Angeles"
 	AmericaCaracasTimeZone      = "America/Caracas"
 	AmericaSaoPauloTimeZone     = "America/Sao_Paulo"
+	EuropeLisbon                = "Europe/Lisbon"
+	EuropeMadrid                = "Europe/Madrid"
 
 	MINUS_ONE_GMT    = -1
 	MINUS_TWO_GMT    = -2
