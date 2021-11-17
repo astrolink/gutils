@@ -38,7 +38,7 @@ const (
 	AmericaLimaTimeZone         = "America/Lima"
 	AmericaMontevideoTimeZone   = "America/Montevideo"
 	AmericaNewYorkTimeZone      = "America/New_York"
-	AmericaLosAngeles		    = "America/Los_Angeles"
+	AmericaLosAngeles           = "America/Los_Angeles"
 	AmericaCaracasTimeZone      = "America/Caracas"
 	AmericaSaoPauloTimeZone     = "America/Sao_Paulo"
 
