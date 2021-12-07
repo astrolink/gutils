@@ -79,10 +79,10 @@ func CreateCreatedResponse(w http.ResponseWriter, data interface{}) {
 }
 
 // CreateCustomStatusCodeResponse cria uma resposta com o código de status http recebido
-// e envia os erros no atributo body
-func CreateCustomStatusCodeResponse(statusCode int, w http.ResponseWriter, err error) {
+// e envia os dados no atributo body
+func CreateCustomStatusCodeResponse(statusCode int, w http.ResponseWriter, data interface{}) {
 	w.WriteHeader(statusCode)
-	responseErrorData(w, err)
+	responseData(w, data)
 }
 
 // CreateTooManyRequestsResponse creates a response with 429 HTTP status code
