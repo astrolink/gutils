@@ -26,6 +26,23 @@ func responseErrorData(w http.ResponseWriter, err error) {
 	}
 }
 
+func responseData(w http.ResponseWriter, data interface{}) {
+	var bytes []byte
+	var err error
+
+	if data != nil {
+		bytes, err = json.Marshal(data)
+
+		if err != nil {
+			err = fmt.Errorf(ErrorParsingDataToBytesErrorMessage, err.Error())
+			log.Println(err)
+			return
+		}
+	}
+
+	w.Write(bytes)
+}
+
 // CreateBadRequestResponse cria uma resposta com HTTP status code 400
 // e envia o erro no atributo body
 func CreateBadRequestResponse(w http.ResponseWriter, err error) {
@@ -44,21 +61,7 @@ func CreateInternalServerErrorResponse(w http.ResponseWriter, err error) {
 // e envia os dados no atributo body
 func CreateSuccessResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set(ContentTypeHeaderKey, ApplicationJsonHeaderValue)
-
-	var bytes []byte
-	var err error
-
-	if data != nil {
-		bytes, err = json.Marshal(data)
-
-		if err != nil {
-			err = fmt.Errorf(ErrorParsingDataToBytesErrorMessage, err.Error())
-			log.Println(err)
-			return
-		}
-	}
-
-	w.Write(bytes)
+	responseData(w, data)
 }
 
 // CreateNoContentResponse cria uma resposta com HTTP status code 203
@@ -71,22 +74,8 @@ func CreateNoContentResponse(w http.ResponseWriter) {
 // e envia dados no atributo body
 func CreateCreatedResponse(w http.ResponseWriter, data interface{}) {
 	w.Header().Set(ContentTypeHeaderKey, ApplicationJsonHeaderValue)
-
-	var bytes []byte
-	var err error
-
-	if data != nil {
-		bytes, err = json.Marshal(data)
-
-		if err != nil {
-			err = fmt.Errorf(ErrorParsingDataToBytesErrorMessage, err.Error())
-			log.Println(err)
-			return
-		}
-	}
-
 	w.WriteHeader(http.StatusCreated)
-	w.Write(bytes)
+	responseData(w, data)
 }
 
 // CreateCustomStatusCodeResponse cria uma resposta com o código de status http recebido
