@@ -214,3 +214,21 @@ func ConvertCurrencyToFloat64(price int64) float64 {
 	f, _ := strconv.ParseFloat(strPrice, 64)
 	return f
 }
+
+// ReplaceI18nQueries funcao responsavel por substituir #i18n nas queries
+// exemplo: SELECT fee_tag_adjetivo_m#i18n AS feeling_male FROM feelings_tags
+func ReplaceI18nQueries(i18nLang, query string) string {
+	switch i18nLang {
+	case "en_us":
+		query = strings.ReplaceAll(query, "#i18n", "_en_us")
+		break
+	case "es":
+		query = strings.ReplaceAll(query, "#i18n", "_es")
+		break
+	default:
+		query = strings.ReplaceAll(query, "#i18n", "")
+		break
+	}
+
+	return query
+}
