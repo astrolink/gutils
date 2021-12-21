@@ -50,6 +50,13 @@ func CreateBadRequestResponse(w http.ResponseWriter, err error) {
 	responseErrorData(w, err)
 }
 
+// CreateNotFoundResponse cria uma resposta com HTTP status code 404
+// e envia o erro no atributo body
+func CreateNotFoundResponse(w http.ResponseWriter, err error) {
+	w.WriteHeader(http.StatusNotFound)
+	responseErrorData(w, err)
+}
+
 // CreateInternalServerErrorResponse cria uma resposta com HTTP status code 500
 // e envia o erro no atributo body
 func CreateInternalServerErrorResponse(w http.ResponseWriter, err error) {
