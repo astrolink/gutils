@@ -105,6 +105,16 @@ func (r *Redis) DelMany(keys []string) error {
 	return nil
 }
 
+// DelManyFormattedKeys remove várias chaves já formatadas com o nome do serviço
+func (r *Redis) DelManyFormattedKeys(keys []string) error {
+
+	_, err := r.Client.Del(keys...).Result()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // Get get key.
 func (r *Redis) Get(key string) (string, error) {
 	key = buildServiceKey(key)
