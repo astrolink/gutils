@@ -215,7 +215,7 @@ func (r *Redis) DelByKeysPattern(match string) error {
 		return err
 	}
 
-	err = r.DelMany(keys)
+	err = r.DelManyFormattedKeys(keys)
 	return err
 }
 
