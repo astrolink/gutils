@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	PtBr = "pt_br"
-	Es   = "es"
-	EnUs = "en_us"
+	PtBr     = "pt_br"
+	Es       = "es"
+	EnUs     = "en_us"
+	I18nHash = "#i18n"
 )
 
 func getAllowedLangs() []string {
@@ -67,14 +68,14 @@ func Translate(line string, idiom string, replacements []string) string {
 // exemplo: SELECT fee_tag_adjetivo_m#i18n AS feeling_male FROM feelings_tags
 func ReplaceI18nQueries(i18nLang, query string) string {
 	switch i18nLang {
-	case "en_us":
-		query = strings.ReplaceAll(query, "#i18n", "_en_us")
+	case EnUs:
+		query = strings.ReplaceAll(query, I18nHash, "_en_us")
 		break
-	case "es":
-		query = strings.ReplaceAll(query, "#i18n", "_es")
+	case Es:
+		query = strings.ReplaceAll(query, I18nHash, "_es")
 		break
 	default:
-		query = strings.ReplaceAll(query, "#i18n", "")
+		query = strings.ReplaceAll(query, I18nHash, "")
 		break
 	}
 
