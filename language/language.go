@@ -1,14 +1,26 @@
 package language
 
 import (
+	"fmt"
 	"github.com/astrolink/gutils/general"
 	"strconv"
 	"strings"
 )
 
+const (
+	PtBr = "pt_br"
+	Es   = "es"
+	EnUs = "en_us"
+)
+
+func getAllowedLangs() []string {
+	return []string{EnUs, Es, PtBr}
+}
+
 var translationKeys map[string]string
 var contexts []string
 
+// LoadLang carrega em memória o arquivo de tradução para determinado contexto e idioma
 func LoadLang(lang map[string]map[string]string, context string, idiom string) {
 	contextIdiom := context + "_" + idiom
 
@@ -31,6 +43,8 @@ func LoadLang(lang map[string]map[string]string, context string, idiom string) {
 	contexts = append(contexts, contextIdiom)
 }
 
+// Translate substitui a chave de idiomas pelo seu valor correspondente definido
+// no arquivo de tradução
 func Translate(line string, idiom string, replacements []string) string {
 	value := ""
 
@@ -65,4 +79,16 @@ func ReplaceI18nQueries(i18nLang, query string) string {
 	}
 
 	return query
+}
+
+// SetLang atribui valor à propriedade de idiomas do repositório
+func SetLang(lang *string, langArg string) {
+	if langArg == PtBr {
+		return
+	}
+
+	allowedLangs := getAllowedLangs()
+	if ok, _ := general.InArray(langArg, allowedLangs); ok {
+		*lang = fmt.Sprintf("_%s", langArg)
+	}
 }
