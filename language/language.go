@@ -92,3 +92,9 @@ func SetLang(lang *string, langArg string) {
 		*lang = fmt.Sprintf("_%s", langArg)
 	}
 }
+
+// SetI18nQueryFields substitui o hash #i18n pelo idioma correspondente configurado
+// no atributo lang do repositório
+func SetI18nQueryFields(lang, query string) string {
+	return strings.ReplaceAll(query, I18nHash, lang)
+}
