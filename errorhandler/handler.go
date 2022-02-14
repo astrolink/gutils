@@ -3,13 +3,14 @@ package errorhandler
 import (
 	"encoding/json"
 	"github.com/astrolink/gutils/language"
+	ghttp "github.com/astrolink/gutils/http"
 	"net/http"
 )
 
 /**
- ErrorHandler foi criado para padronizar e possibilitar a traducao de mensagens de erro
- a ideia eh que seja utilizada para retornos de APIs
- para passar uma mensagem clara tanto ao usuario como ao administrador
+ ErrorHandler foi criado para padronizar e possibilitar a tradução de mensagens de erro
+ a ideia é que seja utilizado para retornos de APIs
+ para passar uma mensagem clara tanto ao usuário como ao administrador
 	Exemplo de response:
 		{
 			"error": {
@@ -33,16 +34,12 @@ type Lang struct {
 	MessagesLang map[string]map[string]string
 }
 
-// HasLang valida se foi carregado as lang necessarias
+// HasLang valida se foram carregadas as lang necessárias
 func (l *Lang) HasLang() bool {
-	if l.Idiom == "" || len(l.MessagesLang) == 0 || l.Context == "" {
-		return false
-	}
-
-	return true
+	return l.Idiom != "" && len(l.MessagesLang) > 0 && l.Context != ""
 }
 
-// LoadLanguages funcao principal necessaria para carregar as mensagens de erro que serao utilizadas
+// LoadLanguages função principal necessária para carregar as mensagens de erro que serão utilizadas
 func LoadLanguages(messages map[string]map[string]string, context string) ErrorObject {
 	return ErrorObject{
 		Lang: Lang{
@@ -52,7 +49,7 @@ func LoadLanguages(messages map[string]map[string]string, context string) ErrorO
 	}
 }
 
-// BuildErrorMessage responsavel por atribuir os valores que serao usados para criar uma mensagem de erro internacionalizada
+// BuildErrorMessage responsável por atribuir os valores que serão usados para criar uma mensagem de erro internacionalizada
 func (e *ErrorObject) BuildErrorMessage(idiom, messageKey string, replacements []string) *ErrorObject {
 	e.Lang.Idiom = idiom
 	e.Lang.MessageKey = messageKey
@@ -69,7 +66,7 @@ func (e *ErrorObject) GetErrorMessage() string {
 	return e.Error.Error()
 }
 
-// SetError funcao generica para ser utilizada caso NAO seja necessario mensagem customizada traduzida
+// SetError função genérica para ser utilizada caso NÃO seja necessária mensagem customizada traduzida
 func (e *ErrorObject) SetError(err error, statusCode int) *ErrorObject {
 	e.Error = err
 	e.StatusCode = statusCode
@@ -86,8 +83,8 @@ type detail struct {
 }
 
 // getErrorResponse
-// responsavel por fazer o parse dos parametros para gerar uma mensagem customizada
-// devolver o objeto ErrorResponse que sera utilizada para devolver um erro estruturado na api
+// responsável por fazer o parse dos parâmetros para gerar uma mensagem customizada
+// devolver o objeto ErrorResponse que será utilizado para devolver um erro estruturado na api
 func (e *ErrorObject) getErrorResponse() ErrorResponse {
 	if !e.Lang.HasLang() {
 		return ErrorResponse{
@@ -110,9 +107,9 @@ func (e *ErrorObject) getErrorResponse() ErrorResponse {
 	return handler
 }
 
-// CreateErrorResponse constroi a estrutura padrao de mensagem de erro e escreve a resposta na request
+// CreateErrorResponse constrói a estrutura padrão de mensagem de erro e escreve a resposta no response
 func (e *ErrorObject) CreateErrorResponse(w http.ResponseWriter, err error, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set(ghttp.ContentTypeHeaderKey, ghttp.ApplicationJsonHeaderValue)
 	w.WriteHeader(statusCode)
 
 	e.Error = err
