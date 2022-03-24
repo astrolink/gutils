@@ -8,8 +8,10 @@ import (
 )
 
 const (
-	ContentTypeHeaderKey = "Content-Type"
-	ApplicationJsonHeaderValue = "application/json"
+	ContentTypeHeaderKey                = "Content-Type"
+	ApplicationJsonHeaderValue          = "application/json"
+	CustomRealIpHeaderKey               = "X-Real-Ip"
+	CustomForwardedForKey               = "X-Forwarded-For"
 	ErrorParsingDataToBytesErrorMessage = "error parsing data interface to bytes array, %s"
 )
 
