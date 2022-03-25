@@ -1,6 +1,7 @@
 package log
 
 import (
+	ghttp "github.com/astrolink/gutils/http"
 	gqueue "github.com/astrolink/gutils/queue"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ type AuditItem struct {
 	StateBefore      string `json:"stateBefore"`
 	StateAfter       string `json:"stateAfter"`
 	CustomParameters string `json:"customParameters"`
+	Type             string `json:"type"`
 }
 
 func NewAuditItem() *AuditItem {
@@ -62,9 +64,10 @@ func (a *AuditLogger) SetRequest(r *http.Request) {
 
 func (a *AuditLogger) buildAuditItem() AuditItem {
 	built := *NewAuditItem()
+	built.Type = AuditLogMessageType
 	built.File = getCallerFullInfo()
 	built.ServiceName = getBinName()
-	built.Ip = GetRequestRealIp(&a.Request)
+	built.Ip = ghttp.GetRequestRealIp(&a.Request)
 	built.UserAgent = GetUserAgent(&a.Request)
 	return built
 }

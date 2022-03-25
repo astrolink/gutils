@@ -2,14 +2,12 @@ package log
 
 import (
 	"fmt"
-	ghttp "github.com/astrolink/gutils/http"
 	gtime "github.com/astrolink/gutils/time"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 	"time"
 )
 
@@ -32,32 +30,6 @@ func getBinName() string {
 	binName := os.Args[0]
 	binName = filepath.Base(binName)
 	return binName
-}
-
-func GetRequestRealIp(r *http.Request) string {
-	var ip string
-
-	if r == nil {
-		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "ip"))
-		return ip
-	}
-
-	ip = r.Header.Get(ghttp.CustomRealIpHeaderKey)
-
-	if ip == "" {
-		forwardedFor := r.Header.Get(ghttp.CustomForwardedForKey)
-		ips := strings.Split(forwardedFor, ",")
-
-		if len(ips) > 0 {
-			ip = ips[0]
-		}
-
-		if ip == "" {
-			ip = r.RemoteAddr
-		}
-	}
-
-	return ip
 }
 
 func GetUserAgent(r *http.Request) string {
