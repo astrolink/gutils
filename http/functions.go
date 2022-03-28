@@ -67,6 +67,29 @@ func GetRequestRealIp(r *http.Request) string {
 	return ip
 }
 
+func GetUserAgent(r *http.Request) string {
+	var agent string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "user agent"))
+		return agent
+	}
+
+	return r.UserAgent()
+}
+
+func GetCurrentRoute(r *http.Request) string {
+	var route string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "current route"))
+		return route
+	}
+
+	route = fmt.Sprintf("%s/%s", r.Host, r.URL.Path)
+	return route
+}
+
 func responseErrorData(w http.ResponseWriter, err error) {
 	if err != nil {
 		message := err.Error()

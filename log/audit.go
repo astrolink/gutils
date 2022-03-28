@@ -93,7 +93,7 @@ func (a *AuditLogger) SendAuditLog(item AuditItem) error {
 	auditItem.Route = item.Route
 
 	if item.Route == "" {
-		item.Route = GetCurrentRoute(&a.Request)
+		auditItem.Route = GetCurrentRoute(&a.Request)
 	}
 
 	auditItem.StateBefore = item.StateBefore

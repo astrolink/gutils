@@ -3,8 +3,6 @@ package log
 import (
 	"fmt"
 	gtime "github.com/astrolink/gutils/time"
-	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -30,27 +28,4 @@ func getBinName() string {
 	binName := os.Args[0]
 	binName = filepath.Base(binName)
 	return binName
-}
-
-func GetUserAgent(r *http.Request) string {
-	var agent string
-
-	if r == nil {
-		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "user agent"))
-		return agent
-	}
-
-	return r.UserAgent()
-}
-
-func GetCurrentRoute(r *http.Request) string {
-	var route string
-
-	if r == nil {
-		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "current route"))
-		return route
-	}
-
-	route = fmt.Sprintf("%s/%s", r.Host, r.URL.Path)
-	return route
 }
