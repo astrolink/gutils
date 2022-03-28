@@ -24,6 +24,23 @@ const (
 	EmptyRequestObjectErrorMessage      = "no request object was set to get %s"
 )
 
+func GetRequestUsername(r *http.Request) string {
+	var username string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "username"))
+		return username
+	}
+
+	username = r.Header.Get(CustomConsumerUsernameHeaderKey)
+
+	if username == "" {
+		username = r.Header.Get(CustomCredentialUsernameHeaderKey)
+	}
+
+	return username
+}
+
 func GetRequestRealIp(r *http.Request) string {
 	var ip string
 
