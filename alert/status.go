@@ -45,7 +45,7 @@ func (s *StatusAlert) SetWebhook(name, url string) error {
 	var err error
 	
 	if s == nil {
-		return
+		return err
 	}
 
 	if in, _ := general.InArray(name, getSupportedChannels()); !in {
