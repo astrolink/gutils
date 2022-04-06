@@ -43,6 +43,10 @@ func NewStatusAlert() *StatusAlert {
 // SetWebhook associate a channel webhook name to a channel webhook url
 func (s *StatusAlert) SetWebhook(name, url string) error {
 	var err error
+	
+	if s == nil {
+		return
+	}
 
 	if in, _ := general.InArray(name, getSupportedChannels()); !in {
 		err = fmt.Errorf("%s channel is not in supported channel webhook list, supported: [%s]", name, strings.Join(getSupportedChannels(), ","))
@@ -58,6 +62,11 @@ func (s *StatusAlert) SetWebhook(name, url string) error {
 func (s *StatusAlert) SendSlackMessage(messageContent, webhookName string) {
 	var err error
 	var endpoint string
+	
+	if s == nil {
+		return
+	}
+
 
 	if in, _ := general.InArray(webhookName, getSupportedChannels()); !in {
 		err = fmt.Errorf("%s channel is not in supported channel webhookName list, supported: [%s]", webhookName, strings.Join(getSupportedChannels(), ","))

@@ -5,13 +5,90 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 const (
-	ContentTypeHeaderKey = "Content-Type"
-	ApplicationJsonHeaderValue = "application/json"
+	ContentTypeHeaderKey                = "Content-Type"
+	ApplicationJsonHeaderValue          = "application/json"
+	CustomRealIpHeaderKey               = "X-Real-Ip"
+	CustomForwardedForKey               = "X-Forwarded-For"
+	CustomOriginEnvironmentHeaderKey    = "X-Origin-Environment"
+	CustomCredentialUsernameHeaderKey   = "X-Credential-Username"
+	CustomConsumerUsernameHeaderKey     = "X-Consumer-Username"
+	CustomAppFirstAccessHeaderKey       = "X-App-First-Access"
+	CustomI18nLanguageHeaderKey         = "X-I18n-Language"
+	CloudflairIpCountryHeaderKey        = "Cf-Ipcountry"
+	AuthorizationHeaderKey              = "Authorization"
 	ErrorParsingDataToBytesErrorMessage = "error parsing data interface to bytes array, %s"
+	EmptyRequestObjectErrorMessage      = "no request object was set to get %s"
 )
+
+func GetRequestUsername(r *http.Request) string {
+	var username string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "username"))
+		return username
+	}
+
+	username = r.Header.Get(CustomConsumerUsernameHeaderKey)
+
+	if username == "" {
+		username = r.Header.Get(CustomCredentialUsernameHeaderKey)
+	}
+
+	return username
+}
+
+func GetRequestRealIp(r *http.Request) string {
+	var ip string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "ip"))
+		return ip
+	}
+
+	ip = r.Header.Get(CustomRealIpHeaderKey)
+
+	if ip == "" {
+		forwardedFor := r.Header.Get(CustomForwardedForKey)
+		ips := strings.Split(forwardedFor, ",")
+
+		if len(ips) > 0 {
+			ip = ips[0]
+		}
+
+		if ip == "" {
+			ip = r.RemoteAddr
+		}
+	}
+
+	return ip
+}
+
+func GetUserAgent(r *http.Request) string {
+	var agent string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "user agent"))
+		return agent
+	}
+
+	return r.UserAgent()
+}
+
+func GetCurrentRoute(r *http.Request) string {
+	var route string
+
+	if r == nil {
+		log.Println(fmt.Sprintf(EmptyRequestObjectErrorMessage, "current route"))
+		return route
+	}
+
+	route = fmt.Sprintf("%s/%s", r.Host, r.URL.Path)
+	return route
+}
 
 func responseErrorData(w http.ResponseWriter, err error) {
 	if err != nil {
