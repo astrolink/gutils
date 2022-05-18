@@ -59,6 +59,8 @@ func ConvertIntInterfaceToString(value interface{}) (string, error) {
 	var longResult int64
 
 	switch i := value.(type) {
+	case string:
+		return value.(string), nil
 	case int:
 		intResult, _ = value.(int)
 		stringResult = strconv.Itoa(intResult)
