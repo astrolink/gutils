@@ -19,7 +19,7 @@ func (e *ErrorMessage) getError() string {
 
 // IsEmpty valida se ErrorMessage é vazio
 func (e *ErrorMessage) IsEmpty() bool {
-	if e == nil {
+	if e == nil || e.StatusCode == 0 {
 		return true
 	}
 
