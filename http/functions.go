@@ -3,6 +3,8 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astrolink/gutils/general"
+	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -174,4 +176,15 @@ func CreateTooManyRequestsResponse(w http.ResponseWriter, err error) {
 	w.Header().Set(ContentTypeHeaderKey, ApplicationJsonHeaderValue)
 	w.WriteHeader(http.StatusTooManyRequests)
 	responseErrorData(w, err)
+}
+
+// SanitizeRequest Sanitiza a request prevenindo xss
+func SanitizeRequest(request map[string]string, ignore []string) map[string]string {
+	for key := range request {
+		isIgnored, _ := general.InArray(key, ignore)
+		if !isIgnored {
+			request[key] = html.EscapeString(request[key])
+		}
+	}
+	return request
 }
