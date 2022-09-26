@@ -179,12 +179,14 @@ func CreateTooManyRequestsResponse(w http.ResponseWriter, err error) {
 }
 
 // SanitizeRequest Sanitiza a request, substituindo tags html pelas suas entidades
-func SanitizeRequest(request map[string]string, ignore []string) map[string]string {
-	for key := range request {
+func SanitizeRequest(request map[string]interface{}, ignore []string) map[string]interface{} {
+	for key, item := range request {
 		isIgnored, _ := general.InArray(key, ignore)
 		if !isIgnored {
-			request[key] = html.EscapeString(request[key])
+			itemStr := fmt.Sprintf("%v", item)
+			item = html.EscapeString(itemStr)
 		}
+		request[key] = item
 	}
 	return request
 }
