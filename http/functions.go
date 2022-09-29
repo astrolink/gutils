@@ -3,6 +3,8 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/astrolink/gutils/general"
+	"html"
 	"log"
 	"net/http"
 	"strings"
@@ -174,4 +176,17 @@ func CreateTooManyRequestsResponse(w http.ResponseWriter, err error) {
 	w.Header().Set(ContentTypeHeaderKey, ApplicationJsonHeaderValue)
 	w.WriteHeader(http.StatusTooManyRequests)
 	responseErrorData(w, err)
+}
+
+// SanitizeRequest Sanitiza a request, substituindo tags html pelas suas entidades
+func SanitizeRequest(request map[string]interface{}, ignore []string) map[string]interface{} {
+	for key, item := range request {
+		isIgnored, _ := general.InArray(key, ignore)
+		if !isIgnored {
+			itemStr := fmt.Sprintf("%v", item)
+			item = html.EscapeString(itemStr)
+		}
+		request[key] = item
+	}
+	return request
 }
