@@ -17,3 +17,6 @@ vendor/
 .idea/
 
 go.sum
+
+.vscode
+.DS_Store
