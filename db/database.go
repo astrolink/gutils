@@ -69,6 +69,22 @@ func (d *Database) ExecuteWithTx(tx *sql.Tx, query string, args ...interface{}) 
 	return result, nil
 }
 
+
+//MapScanWithTx Get the result of a query in this format: map[string]interface{} into the transaction
+func (d *Database) MapScanWithTx(tx *sql.Tx, query string, args ...interface{}) (map[string]interface{}, error) {
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return mapScanReadRows(rows, args)
+}
+
 //MapScan Get the result of a query in this format: map[string]interface{}
 func (d *Database) MapScan(query string, args ...interface{}) (map[string]interface{}, error) {
 	stmt, err := d.Conn.Prepare(query)
@@ -82,6 +98,11 @@ func (d *Database) MapScan(query string, args ...interface{}) (map[string]interf
 		return nil, err
 	}
 	defer rows.Close()
+	return mapScanReadRows(rows, args)
+}
+
+// mapScanReadRows read rows and get the result of a query in this format: map[string]interface{}
+func mapScanReadRows(rows *sql.Rows, args ...interface{}) (map[string]interface{}, error) {
 	columns, err := rows.Columns()
 	if err != nil {
 		return nil, err
@@ -405,6 +426,24 @@ func (d *Database) setRedisBySliceMapScan(query string, redis *cache.Redis, redi
 	return data, mapScanError
 }
 
+//SliceMapScanWithTx Fetch all lines of given select into a Tx
+func (d *Database) SliceMapScanWithTx(tx *sql.Tx, query string, args ...interface{}) ([]map[string]interface{}, error) {
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	return sliceMapScanReadRows(rows, args)
+}
+
 //SliceMapScan Fetch all lines of given select
 func (d *Database) SliceMapScan(query string, args ...interface{}) ([]map[string]interface{}, error) {
 	stmt, err := d.Conn.Prepare(query)
@@ -417,6 +456,12 @@ func (d *Database) SliceMapScan(query string, args ...interface{}) ([]map[string
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
+	return sliceMapScanReadRows(rows, args)
+}
+
+// sliceMapScanReadRows read rows and get the result of a query in this format: []map[string]interface{}
+func sliceMapScanReadRows(rows *sql.Rows, args ...interface{}) ([]map[string]interface{}, error){
 	columns, err := rows.Columns()
 	if err != nil {
 		return nil, err
