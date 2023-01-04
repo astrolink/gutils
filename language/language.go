@@ -11,11 +11,14 @@ const (
 	PtBr     = "pt_br"
 	Es       = "es"
 	EnUs     = "en_us"
+	Fr       = "fr"
+	It       = "it"
+	De       = "de"
 	I18nHash = "#i18n"
 )
 
 func getAllowedLangs() []string {
-	return []string{EnUs, Es, PtBr}
+	return []string{PtBr, Es, EnUs, Fr, It, De}
 }
 
 var translationKeys map[string]string
@@ -64,7 +67,7 @@ func Translate(line string, idiom string, replacements []string) string {
 	return value
 }
 
-// ReplaceI18nQueries funcao responsavel por substituir #i18n nas queries
+// ReplaceI18nQueries função responsável por substituir #i18n nas queries
 // exemplo: SELECT fee_tag_adjetivo_m#i18n AS feeling_male FROM feelings_tags
 func ReplaceI18nQueries(i18nLang, query string) string {
 	switch i18nLang {
@@ -73,6 +76,15 @@ func ReplaceI18nQueries(i18nLang, query string) string {
 		break
 	case Es:
 		query = strings.ReplaceAll(query, I18nHash, "_es")
+		break
+	case Fr:
+		query = strings.ReplaceAll(query, I18nHash, "_fr")
+		break
+	case It:
+		query = strings.ReplaceAll(query, I18nHash, "_it")
+		break
+	case De:
+		query = strings.ReplaceAll(query, I18nHash, "_de")
 		break
 	default:
 		query = strings.ReplaceAll(query, I18nHash, "")
