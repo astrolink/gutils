@@ -227,6 +227,45 @@ func (r *Redis) Close() {
 	}
 }
 
+const forceLogoutKey = "force_logout"
+
+// CreateForceLogoutKeys cria as chaves que serão inseridas no cache e que devem forçar
+// o logout do usuário em outros dispositivos
+func (r *Redis) CreateForceLogoutKeys(jwtTokens []interface{}, duration time.Duration) error {
+	keys, values := generateForceLogoutKeys(jwtTokens)
+
+	var ifaces []interface{}
+	pipe := r.Client.TxPipeline()
+	for i := range keys {
+		key := keys[i]
+		ifaces = append(ifaces, key, values[i])
+		pipe.Expire(key, duration)
+	}
+
+	if err := r.Client.MSet(ifaces...).Err(); err != nil {
+		return err
+	}
+
+	if _, err := pipe.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// generateForceLogoutKeys cria as chaves através dos jwts ativos de um usuário para que ele possa ser deslogado
+// de todos os dispositivos que sua conta esteja conectada
+func generateForceLogoutKeys(jwtTokens []interface{}) ([]string, []interface{}){
+	keys := make([]string, len(jwtTokens))
+	values := make([]interface{}, len(jwtTokens))
+
+	for i, token := range jwtTokens {
+		keys[i] = fmt.Sprintf("%s:%v", forceLogoutKey, token)
+		values[i] = true
+	}
+	return keys, values
+}
+
 //build key from binary name
 func buildServiceKey(key string) string {
 	binaryName := os.Args[0]
