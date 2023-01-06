@@ -231,7 +231,7 @@ const forceLogoutKey = "force_logout"
 
 // CreateForceLogoutKeys cria as chaves que serão inseridas no cache e que devem forçar
 // o logout do usuário em outros dispositivos
-func (r *Redis) CreateForceLogoutKeys(jwtTokens []interface{}, duration time.Duration) error {
+func (r *Redis) CreateForceLogoutKeys(duration time.Duration, jwtTokens ...string) error {
 	keys, values := generateForceLogoutKeys(jwtTokens)
 
 	var ifaces []interface{}
@@ -255,7 +255,7 @@ func (r *Redis) CreateForceLogoutKeys(jwtTokens []interface{}, duration time.Dur
 
 // generateForceLogoutKeys cria as chaves através dos jwts ativos de um usuário para que ele possa ser deslogado
 // de todos os dispositivos que sua conta esteja conectada
-func generateForceLogoutKeys(jwtTokens []interface{}) ([]string, []interface{}){
+func generateForceLogoutKeys(jwtTokens []string) ([]string, []interface{}){
 	keys := make([]string, len(jwtTokens))
 	values := make([]interface{}, len(jwtTokens))
 
