@@ -81,7 +81,7 @@ func NewRabbitTopic(config Config) (*RabbitMQ, error) {
 
     exchangeType := "topic"
 
-    r.exchange, err = r.channel.ExchangeDeclare(name, exchangeType, true, false, false, false, nil)
+    err = r.channel.ExchangeDeclare(name, exchangeType, true, false, false, false, nil)
 
     if err != nil {
         err = fmt.Errorf("error declaring exchange, %s", err.Error())
