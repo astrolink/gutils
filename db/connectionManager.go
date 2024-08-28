@@ -25,13 +25,18 @@ func NewPgSqlConnectionManager(config Config) *ConnectionManager {
 // 		tx *sql.Tx  é a transação que está sendo trabalhada pela conexão
 //		err *error passar ponteiro do erro para ser analisado
 func (c *ConnectionManager) HandleTransaction(tx *sql.Tx, err *error) error {
-	defer c.Close()
+	defer connManager.Close()
 
 	if *err != nil {
-		return tx.Rollback()
+		if err := tx.Rollback(); err != nil {
+			log.Println(err)
+		}
+		return
 	}
 
-	return tx.Commit()
+	if err := tx.Commit(); err != nil {
+		log.Println(err)
+	}
 }
 
 // StartTransaction inicia uma transação com o banco de dados
