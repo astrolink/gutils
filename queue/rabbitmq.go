@@ -1,6 +1,5 @@
 package queue
 
-
 import (
 	"encoding/json"
 	"fmt"
@@ -10,10 +9,10 @@ import (
 )
 
 type RabbitMQ struct {
-	conn *amqp.Connection
+	conn    *amqp.Connection
 	channel *amqp.Channel
-	queue amqp.Queue
-	config Config
+	queue   amqp.Queue
+	config  Config
 }
 
 // NewRabbitMQ creates a nem instance on RabbitMQ
@@ -50,50 +49,46 @@ func NewRabbitMQ(config Config) (*RabbitMQ, error) {
 		return &r, err
 	}
 
-
 	return &r, nil
 }
 
 func NewRabbitTopic(config Config) (*RabbitMQ, error) {
-    var err error
-    r := RabbitMQ{config: config}
+	var err error
+	r := RabbitMQ{config: config}
 
-    err = r.connect()
+	err = r.connect()
 
-    if err != nil {
-        err = fmt.Errorf("error opening rabbit connection, %s", err.Error())
-        log.Println(err)
-        return &r, err
-    }
+	if err != nil {
+		err = fmt.Errorf("error opening rabbit connection, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
 
-    // creating channel
-    r.channel, err = r.conn.Channel()
+	// creating channel
+	r.channel, err = r.conn.Channel()
 
-    if err != nil {
-        err = fmt.Errorf("error opening channel, %s", err.Error())
-        log.Println(err)
-        return &r, err
-    }
+	if err != nil {
+		err = fmt.Errorf("error opening channel, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
 
-    // creating queue
-    // in here we took the database attribute as queue name just for reuse purposes
-    name := config.GetDatabase()
+	// creating queue
+	// in here we took the database attribute as queue name just for reuse purposes
+	name := config.GetDatabase()
 
-    exchangeType := "topic"
+	exchangeType := "topic"
 
-    err = r.channel.ExchangeDeclare(name, exchangeType, true, false, false, false, nil)
+	err = r.channel.ExchangeDeclare(name, exchangeType, true, false, false, false, nil)
 
-    if err != nil {
-        err = fmt.Errorf("error declaring exchange, %s", err.Error())
-        log.Println(err)
-        return &r, err
-    }
+	if err != nil {
+		err = fmt.Errorf("error declaring exchange, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
 
-
-    return &r, nil
+	return &r, nil
 }
-
-
 
 // connect open a connection to rabbit server
 func (r *RabbitMQ) connect() error {
@@ -151,36 +146,34 @@ func (r *RabbitMQ) Publish(data interface{}) error {
 
 // Publish message to a topic exchange
 func (r *RabbitMQ) PublishToTopic(data interface{}, exchangeName, routingKey string) error {
-    body, err := json.Marshal(data)
-    if err != nil {
-        err = fmt.Errorf("error converting data struct to json: %s", err)
-        log.Println(err)
-        return err
-    }
+	body, err := json.Marshal(data)
+	if err != nil {
+		err = fmt.Errorf("error converting data struct to json: %s", err)
+		log.Println(err)
+		return err
+	}
 
-    message := amqp.Publishing{
-        ContentType: "application/json",
-        Body:        body,
-    }
+	message := amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}
 
-    err = r.channel.Publish(
-        exchangeName,
-        routingKey,
-        false,        // Mandatory
-        false,        // Immediate
-        message,
-    )
+	err = r.channel.Publish(
+		exchangeName,
+		routingKey,
+		false, // Mandatory
+		false, // Immediate
+		message,
+	)
 
-    if err != nil {
-        err = fmt.Errorf("error publishing message to topic exchange: %s", err)
-        log.Println(err)
-        return err
-    }
+	if err != nil {
+		err = fmt.Errorf("error publishing message to topic exchange: %s", err)
+		log.Println(err)
+		return err
+	}
 
-    return nil
+	return nil
 }
-
-
 
 // TestRabbitMQConnection tries to connect to specified rabbitQM broker
 func TestRabbitMQConnection(config Config) error {
@@ -197,23 +190,26 @@ func TestRabbitMQConnection(config Config) error {
 	return err
 }
 
+func (r *RabbitMQ) GetConnection() *amqp.Connection {
+	return r.conn
+}
+
 func (r *RabbitMQ) GetChannel() *amqp.Channel {
 	return r.channel
 }
 
 // Close closes the rabbit connection and the channel
-func (r *RabbitMQ) Close()  {
+func (r *RabbitMQ) Close() {
 	r.channel.Close()
 	r.conn.Close()
 }
 
-
 // CloseChannel closes the rabbit channel
-func (r *RabbitMQ) CloseChannel()  {
+func (r *RabbitMQ) CloseChannel() {
 	r.channel.Close()
 }
 
 // CloseConnect closes the rabbit connection
-func (r *RabbitMQ) CloseConnect()  {
+func (r *RabbitMQ) CloseConnect() {
 	r.conn.Close()
 }
