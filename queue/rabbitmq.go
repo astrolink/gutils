@@ -52,6 +52,44 @@ func NewRabbitMQ(config Config) (*RabbitMQ, error) {
 	return &r, nil
 }
 
+func NewRabbitTopic(config Config) (*RabbitMQ, error) {
+	var err error
+	r := RabbitMQ{config: config}
+
+	err = r.connect()
+
+	if err != nil {
+		err = fmt.Errorf("error opening rabbit connection, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
+
+	// creating channel
+	r.channel, err = r.conn.Channel()
+
+	if err != nil {
+		err = fmt.Errorf("error opening channel, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
+
+	// creating queue
+	// in here we took the database attribute as queue name just for reuse purposes
+	name := config.GetDatabase()
+
+	exchangeType := "topic"
+
+	err = r.channel.ExchangeDeclare(name, exchangeType, true, false, false, false, nil)
+
+	if err != nil {
+		err = fmt.Errorf("error declaring exchange, %s", err.Error())
+		log.Println(err)
+		return &r, err
+	}
+
+	return &r, nil
+}
+
 // connect open a connection to rabbit server
 func (r *RabbitMQ) connect() error {
 	var url string
@@ -99,6 +137,37 @@ func (r *RabbitMQ) Publish(data interface{}) error {
 
 	if err != nil {
 		err = fmt.Errorf("error publishing message on queue, %s", err.Error())
+		log.Println(err)
+		return err
+	}
+
+	return nil
+}
+
+// PublishToTopic message to a topic exchange
+func (r *RabbitMQ) PublishToTopic(data interface{}, exchangeName, routingKey string) error {
+	body, err := json.Marshal(data)
+	if err != nil {
+		err = fmt.Errorf("error converting data struct to json: %s", err)
+		log.Println(err)
+		return err
+	}
+
+	message := amqp.Publishing{
+		ContentType: "application/json",
+		Body:        body,
+	}
+
+	err = r.channel.Publish(
+		exchangeName,
+		routingKey,
+		false, // Mandatory
+		false, // Immediate
+		message,
+	)
+
+	if err != nil {
+		err = fmt.Errorf("error publishing message to topic exchange: %s", err)
 		log.Println(err)
 		return err
 	}
