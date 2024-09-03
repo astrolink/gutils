@@ -1,6 +1,5 @@
 package queue
 
-
 import (
 	"encoding/json"
 	"fmt"
@@ -10,10 +9,10 @@ import (
 )
 
 type RabbitMQ struct {
-	conn *amqp.Connection
+	conn    *amqp.Connection
 	channel *amqp.Channel
-	queue amqp.Queue
-	config Config
+	queue   amqp.Queue
+	config  Config
 }
 
 // NewRabbitMQ creates a nem instance on RabbitMQ
@@ -50,10 +49,8 @@ func NewRabbitMQ(config Config) (*RabbitMQ, error) {
 		return &r, err
 	}
 
-
 	return &r, nil
 }
-
 
 // connect open a connection to rabbit server
 func (r *RabbitMQ) connect() error {
@@ -124,23 +121,26 @@ func TestRabbitMQConnection(config Config) error {
 	return err
 }
 
+func (r *RabbitMQ) GetConnection() *amqp.Connection {
+	return r.conn
+}
+
 func (r *RabbitMQ) GetChannel() *amqp.Channel {
 	return r.channel
 }
 
 // Close closes the rabbit connection and the channel
-func (r *RabbitMQ) Close()  {
+func (r *RabbitMQ) Close() {
 	r.channel.Close()
 	r.conn.Close()
 }
 
-
 // CloseChannel closes the rabbit channel
-func (r *RabbitMQ) CloseChannel()  {
+func (r *RabbitMQ) CloseChannel() {
 	r.channel.Close()
 }
 
 // CloseConnect closes the rabbit connection
-func (r *RabbitMQ) CloseConnect()  {
+func (r *RabbitMQ) CloseConnect() {
 	r.conn.Close()
 }
