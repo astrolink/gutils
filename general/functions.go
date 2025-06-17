@@ -175,7 +175,7 @@ func UserNeverSigned(subscribeDate interface{}) bool {
 	}
 	_, err := time.Parse("2006-01-02", subscribeDate.(string))
 	if err != nil {
-		return  true
+		return true
 	}
 	return false
 }
@@ -215,4 +215,12 @@ func ConvertCurrencyToFloat64(price int64) float64 {
 	strPrice = strings.ReplaceAll(strPrice, ",", ".")
 	f, _ := strconv.ParseFloat(strPrice, 64)
 	return f
+}
+
+// ToString converte um valor de interface{} para string
+func ToString(val interface{}) string {
+	if val == nil {
+		return "" // Tratamento explícito para nil
+	}
+	return fmt.Sprint(val) // Equivalente a Sprintf("%v") para não-nulos
 }
