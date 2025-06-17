@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 )
 
 type Crypt struct {
@@ -17,7 +18,7 @@ type Crypt struct {
 func NewCrypt(keyHex, iniVector string) (*Crypt, error) {
 	key, err := hex.DecodeString(keyHex)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("erro ao decodificar chave hex: %s", err)
 	}
 
 	// IV (vetor de inicialização), deve ter exatamente 16 bytes
@@ -29,7 +30,7 @@ func NewCrypt(keyHex, iniVector string) (*Crypt, error) {
 func (c *Crypt) Decrypt(encrypted string) (string, error) {
 	block, err := aes.NewCipher(c.key)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("erro ao criar cipher AES: %s", err)
 	}
 
 	// modo CBC
@@ -38,7 +39,7 @@ func (c *Crypt) Decrypt(encrypted string) (string, error) {
 	// base64 decode (como openssl_encrypt gera base64)
 	ciphertextRaw, err := decodeBase64(encrypted)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("erro ao decodificar base64: %s", err)
 	}
 
 	if len(ciphertextRaw)%aes.BlockSize != 0 {
@@ -49,12 +50,15 @@ func (c *Crypt) Decrypt(encrypted string) (string, error) {
 	mode.CryptBlocks(decrypted, ciphertextRaw)
 
 	// remove padding (PKCS#7)
-	decrypted = pkcs7Unpad(decrypted)
+	decrypted, err = pkcs7Unpad(decrypted)
+	if err != nil {
+		return "", fmt.Errorf("erro ao remover padding: %s", err)
+	}
 
 	// hex -> string
 	decoded, err := hex.DecodeString(string(decrypted))
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("erro ao decodificar hex: %s", err)
 	}
 
 	return string(decoded), nil
@@ -64,14 +68,23 @@ func decodeBase64(data string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(data)
 }
 
-func pkcs7Unpad(data []byte) []byte {
+func pkcs7Unpad(data []byte) ([]byte, error) {
 	length := len(data)
 	if length == 0 {
-		return data
+		return nil, errors.New("dados vazios")
 	}
+
 	padding := int(data[length-1])
-	if padding > length {
-		return data
+	if padding == 0 || padding > length {
+		return nil, errors.New("padding inválido")
 	}
-	return data[:length-padding]
+
+	// Valida todos os bytes de padding
+	for i := 0; i < padding; i++ {
+		if data[length-1-i] != byte(padding) {
+			return nil, errors.New("conteúdo do padding inválido")
+		}
+	}
+
+	return data[:length-padding], nil
 }
