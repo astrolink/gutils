@@ -27,9 +27,6 @@ func NewCrypt(keyHex, iniVector string) (*Crypt, error) {
 
 // Decrypt executa a descriptografia
 func (c *Crypt) Decrypt(encrypted string) (string, error) {
-	// descriptografa direto do base64
-	ciphertext := []byte(encrypted)
-
 	block, err := aes.NewCipher(c.key)
 	if err != nil {
 		return "", err
@@ -39,7 +36,7 @@ func (c *Crypt) Decrypt(encrypted string) (string, error) {
 	mode := cipher.NewCBCDecrypter(block, c.iv)
 
 	// base64 decode (como openssl_encrypt gera base64)
-	ciphertextRaw, err := decodeBase64(ciphertext)
+	ciphertextRaw, err := decodeBase64(encrypted)
 	if err != nil {
 		return "", err
 	}
@@ -63,8 +60,8 @@ func (c *Crypt) Decrypt(encrypted string) (string, error) {
 	return string(decoded), nil
 }
 
-func decodeBase64(data []byte) ([]byte, error) {
-	return base64.StdEncoding.DecodeString(string(data))
+func decodeBase64(data string) ([]byte, error) {
+	return base64.StdEncoding.DecodeString(data)
 }
 
 func pkcs7Unpad(data []byte) []byte {
