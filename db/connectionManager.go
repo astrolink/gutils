@@ -20,6 +20,26 @@ func NewPgSqlConnectionManager(config Config) *ConnectionManager {
 	return &ConnectionManager{db: pgsql}
 }
 
+//NewMySqlConnectionManagerReturningError inicia uma conexão com o banco de dados mysql instanciando um *ConnectionManager
+// e retornando um erro se ocorrer.
+func NewMySqlConnectionManagerReturningError(config Config) (*ConnectionManager, error) {
+	mysql, err := NewMySQLReturningError(config)
+	if err != nil {
+		return nil, err
+	}
+	return &ConnectionManager{db: mysql}, nil
+}
+
+//NewPgSqlConnectionManagerReturningError inicia uma conexão com o banco de dados postgres instanciando um *ConnectionManager
+// e retornando um erro se ocorrer.
+func NewPgSqlConnectionManagerReturningError(config Config) (*ConnectionManager, error) {
+	pgsql, err := NewPgSQLReturningError(config)
+	if err != nil {
+		return nil, err
+	}
+	return &ConnectionManager{db: pgsql}, nil
+}
+
 // HandleTransaction gerencia o estado da conexão efetivando
 // o commit ou o rollback de uma transação de acordo com o erro recebido
 // 		tx *sql.Tx  é a transação que está sendo trabalhada pela conexão
