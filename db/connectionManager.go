@@ -9,36 +9,17 @@ type ConnectionManager struct {
 }
 
 //NewMySqlConnectionManager inicia uma conexão com o banco de dados mysql instanciando um *ConnectionManager
-func NewMySqlConnectionManager(config Config) *ConnectionManager {
-	mysql := NewMySQL(config)
-	return &ConnectionManager{db: mysql}
+func NewMySqlConnectionManager(config Config) (*ConnectionManager, error) {
+	mysql, err := NewMySQL(config)
+	return &ConnectionManager{db: mysql}, err
 }
 
 //NewPgSqlConnectionManager inicia uma conexão com o banco de dados postgres instanciando um *ConnectionManager
-func NewPgSqlConnectionManager(config Config) *ConnectionManager {
-	pgsql := NewPgSQL(config)
-	return &ConnectionManager{db: pgsql}
+func NewPgSqlConnectionManager(config Config) (*ConnectionManager, error) {
+	pgsql, err := NewPgSQL(config)
+	return &ConnectionManager{db: pgsql}, err
 }
 
-//NewMySqlConnectionManagerReturningError inicia uma conexão com o banco de dados mysql instanciando um *ConnectionManager
-// e retornando um erro se ocorrer.
-func NewMySqlConnectionManagerReturningError(config Config) (*ConnectionManager, error) {
-	mysql, err := NewMySQLReturningError(config)
-	if err != nil {
-		return nil, err
-	}
-	return &ConnectionManager{db: mysql}, nil
-}
-
-//NewPgSqlConnectionManagerReturningError inicia uma conexão com o banco de dados postgres instanciando um *ConnectionManager
-// e retornando um erro se ocorrer.
-func NewPgSqlConnectionManagerReturningError(config Config) (*ConnectionManager, error) {
-	pgsql, err := NewPgSQLReturningError(config)
-	if err != nil {
-		return nil, err
-	}
-	return &ConnectionManager{db: pgsql}, nil
-}
 
 // HandleTransaction gerencia o estado da conexão efetivando
 // o commit ou o rollback de uma transação de acordo com o erro recebido

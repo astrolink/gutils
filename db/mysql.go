@@ -9,7 +9,7 @@ import (
 )
 
 // NewMySQL makes a new instance of Database and connect to a MySQL database.
-func NewMySQL(config Config) *Database {
+func NewMySQL(config Config) (*Database, error) {
 
 	connectionLine := "%s:%s@tcp(%s:%d)/%s"
 	connectionLine = fmt.Sprintf(connectionLine,
@@ -21,13 +21,15 @@ func NewMySQL(config Config) *Database {
 	var err error
 	err = mysql.Connect()
 	if err != nil {
-		log.Fatalln(err)
+		err = fmt.Errorf("error connecting to mysql - host: %s, port: %d, user: %s, database: %s | error: %v",
+			config.GetHost(), config.GetPort(), config.GetUser(), config.GetDatabase(), err)
+		log.Println(err)
 	}
-	return &mysql
+	return &mysql, err
 }
 
 // NewCachedMySQL makes a new instance of Database and connect to a MySQL database and Redis.
-func NewCachedMySQL(config Config, cacheConfig cache.Config) *Database {
+func NewCachedMySQL(config Config, cacheConfig cache.Config) (*Database, error) {
 	connectionLine := "%s:%s@tcp(%s:%d)/%s"
 	connectionLine = fmt.Sprintf(connectionLine,
 		config.GetUser(), config.GetPassword(), config.GetHost(), config.GetPort(), config.GetDatabase())
@@ -39,9 +41,11 @@ func NewCachedMySQL(config Config, cacheConfig cache.Config) *Database {
 	var err error
 	err = mysql.Connect()
 	if err != nil {
-		log.Fatalln(err)
+		err = fmt.Errorf("error connecting to mysql - host: %s, port: %d, user: %s, database: %s | error: %v",
+			config.GetHost(), config.GetPort(), config.GetUser(), config.GetDatabase(), err)
+		log.Println(err)
 	}
-	return &mysql
+	return &mysql, err
 }
 
 // NewMySQLReturningError Cria uma nova instância de Database e conecta a um banco de dados MySQL, retornando um erro se ocorrer.
