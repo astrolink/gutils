@@ -105,6 +105,15 @@ func (r *Redis) DelMany(keys []string) error {
 	return nil
 }
 
+// DelManyWithoutMSName delete many keys without building the key with microsservice name.
+func (r *Redis) DelManyWithoutMSName(keys []string) error {
+	_, err := r.Client.Del(keys...).Result()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // DelManyFormattedKeys remove várias chaves já formatadas com o nome do serviço
 func (r *Redis) DelManyFormattedKeys(keys []string) error {
 
