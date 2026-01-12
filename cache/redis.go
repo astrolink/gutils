@@ -35,6 +35,11 @@ func NewRedis(config Config) (*Redis, error) {
 
 // Connect connects on redis database
 func (r *Redis) Connect() error {
+	// Close existing connection if any
+	if r.Client != nil {
+		_ = r.Client.Close()
+	}
+
 	db, _ := strconv.Atoi(r.db.GetDatabase())
 	r.Client = redisClient.NewClient(&redisClient.Options{
 		Addr:     r.db.GetHost() + ":" + strconv.Itoa(r.db.GetPort()),
@@ -71,9 +76,7 @@ func (r *Redis) MSet(keys []string, values []interface{}, duration time.Duration
 		pipe.Expire(key, duration)
 	}
 
-	if err := r.Client.MSet(ifaces...).Err(); err != nil {
-		return err
-	}
+	pipe.MSet(ifaces...)
 
 	if _, err := pipe.Exec(); err != nil {
 		return err
@@ -107,7 +110,6 @@ func (r *Redis) DelMany(keys []string) error {
 
 // DelManyFormattedKeys remove várias chaves já formatadas com o nome do serviço
 func (r *Redis) DelManyFormattedKeys(keys []string) error {
-
 	_, err := r.Client.Del(keys...).Result()
 	if err != nil {
 		return err
@@ -132,13 +134,11 @@ func (r *Redis) Get(key string) (string, error) {
 func (r *Redis) Exist(key string) (bool, error) {
 	key = buildServiceKey(key)
 
-	_, err := r.Client.Get(key).Result()
-	if err == redisClient.Nil {
-		return false, nil
-	} else if err != nil {
+	exists, err := r.Client.Exists(key).Result()
+	if err != nil {
 		return false, err
 	}
-	return true, nil
+	return exists, nil
 }
 
 // FlushAll clears all keys in the cache
@@ -156,10 +156,10 @@ func (r *Redis) Scan(match string) ([]string, error) {
 	var err error
 	var cursor uint64
 	var keys []string
-	var result []string
 	var count int64
 
 	count = 100
+	result := make([]string, 0, count)
 
 	match = buildServiceKey(match)
 
@@ -167,7 +167,7 @@ func (r *Redis) Scan(match string) ([]string, error) {
 		keys, cursor, err = r.Client.Scan(cursor, match, count).Result()
 
 		if err != nil {
-			log.Println(fmt.Printf("error scanning cache keys by match %s, %s", match, err.Error()))
+			log.Println(fmt.Sprintf("error scanning cache keys by match %s, %s", match, err.Error()))
 			return result, err
 		}
 
@@ -181,12 +181,10 @@ func (r *Redis) Scan(match string) ([]string, error) {
 }
 
 // DelByPattern gets redis keys based on a match pattern using Scan() method and then,
-// using DelMany(), removes these keys from redis cache
+// using DelManyFormattedKeys(), removes these keys from redis cache
 func (r *Redis) DelByPattern(match string) error {
 	var err error
 	var keys []string
-
-	match = buildServiceKey(match)
 
 	keys, err = r.Scan(match)
 
@@ -194,7 +192,7 @@ func (r *Redis) DelByPattern(match string) error {
 		return err
 	}
 
-	err = r.DelMany(keys)
+	err = r.DelManyFormattedKeys(keys)
 	return err
 }
 
@@ -255,7 +253,7 @@ func (r *Redis) CreateForceLogoutKeys(duration time.Duration, jwtTokens ...strin
 
 // generateForceLogoutKeys cria as chaves através dos jwts ativos de um usuário para que ele possa ser deslogado
 // de todos os dispositivos que sua conta esteja conectada
-func generateForceLogoutKeys(jwtTokens []string) ([]string, []interface{}){
+func generateForceLogoutKeys(jwtTokens []string) ([]string, []interface{}) {
 	keys := make([]string, len(jwtTokens))
 	values := make([]interface{}, len(jwtTokens))
 
