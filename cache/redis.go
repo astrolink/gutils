@@ -107,7 +107,6 @@ func (r *Redis) DelMany(keys []string) error {
 
 // DelManyFormattedKeys remove várias chaves já formatadas com o nome do serviço
 func (r *Redis) DelManyFormattedKeys(keys []string) error {
-
 	_, err := r.Client.Del(keys...).Result()
 	if err != nil {
 		return err
@@ -181,12 +180,10 @@ func (r *Redis) Scan(match string) ([]string, error) {
 }
 
 // DelByPattern gets redis keys based on a match pattern using Scan() method and then,
-// using DelMany(), removes these keys from redis cache
+// using DelManyFormattedKeys(), removes these keys from redis cache
 func (r *Redis) DelByPattern(match string) error {
 	var err error
 	var keys []string
-
-	match = buildServiceKey(match)
 
 	keys, err = r.Scan(match)
 
@@ -194,7 +191,7 @@ func (r *Redis) DelByPattern(match string) error {
 		return err
 	}
 
-	err = r.DelMany(keys)
+	err = r.DelManyFormattedKeys(keys)
 	return err
 }
 
@@ -255,7 +252,7 @@ func (r *Redis) CreateForceLogoutKeys(duration time.Duration, jwtTokens ...strin
 
 // generateForceLogoutKeys cria as chaves através dos jwts ativos de um usuário para que ele possa ser deslogado
 // de todos os dispositivos que sua conta esteja conectada
-func generateForceLogoutKeys(jwtTokens []string) ([]string, []interface{}){
+func generateForceLogoutKeys(jwtTokens []string) ([]string, []interface{}) {
 	keys := make([]string, len(jwtTokens))
 	values := make([]interface{}, len(jwtTokens))
 
