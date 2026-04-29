@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -67,7 +68,25 @@ func (m *MongoDB) connect() error {
 	}
 	url += m.config.GetHost() + ":" + strconv.Itoa(m.config.GetPort())
 
-	session, err := mgo.Dial("mongodb://" + url)
+	uri := "mongodb://" + url + "/" + m.config.GetDatabase()
+
+	if rs, ok := m.config.(ReplicaSetConfig); ok {
+		var params []string
+		if v := rs.GetReplicaSet(); v != "" {
+			params = append(params, "replicaSet="+v)
+		}
+		if v := rs.GetReadPreference(); v != "" {
+			params = append(params, "readPreference="+v)
+		}
+		if v := rs.GetAuthSource(); v != "" {
+			params = append(params, "authSource="+v)
+		}
+		if len(params) > 0 {
+			uri += "?" + strings.Join(params, "&")
+		}
+	}
+
+	session, err := mgo.Dial(uri)
 	if err != nil {
 		return err
 	}
