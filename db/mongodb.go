@@ -3,6 +3,7 @@ package db
 import (
 	"gopkg.in/mgo.v2"
 	"log"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -54,19 +55,12 @@ func TestMongoDBConnection(config *Config) error {
 
 // connect open a connection to mongodb server
 func (m *MongoDB) connect() error {
-	var url string
-	if m.config.GetUser() != "" {
-		url = m.config.GetUser()
-	}
-	if m.config.GetPassword() != "" {
-		url += ":" + m.config.GetPassword()
-	}
+	var userInfo string
 	if m.config.GetUser() != "" || m.config.GetPassword() != "" {
-		url += "@"
+		userInfo = url.QueryEscape(m.config.GetUser()) + ":" + url.QueryEscape(m.config.GetPassword()) + "@"
 	}
-	url += m.config.GetHost() + ":" + strconv.Itoa(m.config.GetPort())
 
-	uri := "mongodb://" + url + "/" + m.config.GetDatabase()
+	uri := "mongodb://" + userInfo + m.config.GetHost() + ":" + strconv.Itoa(m.config.GetPort()) + "/" + m.config.GetDatabase()
 
 	if rs, ok := m.config.(ReplicaSetConfig); ok {
 		var params []string
