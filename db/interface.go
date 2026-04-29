@@ -22,3 +22,11 @@ type Config interface {
 	GetPassword() string
 	GetDatabase() string
 }
+
+// ReplicaSetConfig is an optional interface that Config implementations can satisfy
+// to enable ReplicaSet connections. Fields are optional — empty strings are ignored.
+type ReplicaSetConfig interface {
+	GetReplicaSet() string
+	GetReadPreference() string
+	GetAuthSource() string
+}
