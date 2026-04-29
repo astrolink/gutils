@@ -42,16 +42,14 @@ func NewMongoDB(config *Config) *MongoDB {
 // TestMongoDBConnection tries to connect to specified mongodb database
 func TestMongoDBConnection(config *Config) error {
 	m := MongoDB{config: *config}
-	var err error
 
-	err = m.connect()
+	if err := m.connect(); err != nil {
+		log.Println(err)
+		return err
+	}
 	defer m.Close()
 
-	if err != nil {
-		log.Println(err)
-	}
-
-	return err
+	return nil
 }
 
 // connect open a connection to mongodb server

@@ -178,16 +178,14 @@ func (r *RabbitMQ) PublishToTopic(data interface{}, exchangeName, routingKey str
 // TestRabbitMQConnection tries to connect to specified rabbitQM broker
 func TestRabbitMQConnection(config Config) error {
 	r := RabbitMQ{config: config}
-	var err error
 
-	err = r.connect()
+	if err := r.connect(); err != nil {
+		log.Println(err)
+		return err
+	}
 	defer r.CloseConnect()
 
-	if err != nil {
-		log.Println(err)
-	}
-
-	return err
+	return nil
 }
 
 func (r *RabbitMQ) GetConnection() *amqp.Connection {
@@ -200,16 +198,24 @@ func (r *RabbitMQ) GetChannel() *amqp.Channel {
 
 // Close closes the rabbit connection and the channel
 func (r *RabbitMQ) Close() {
-	r.channel.Close()
-	r.conn.Close()
+	if r.channel != nil {
+		r.channel.Close()
+	}
+	if r.conn != nil {
+		r.conn.Close()
+	}
 }
 
 // CloseChannel closes the rabbit channel
 func (r *RabbitMQ) CloseChannel() {
-	r.channel.Close()
+	if r.channel != nil {
+		r.channel.Close()
+	}
 }
 
 // CloseConnect closes the rabbit connection
 func (r *RabbitMQ) CloseConnect() {
-	r.conn.Close()
+	if r.conn != nil {
+		r.conn.Close()
+	}
 }
